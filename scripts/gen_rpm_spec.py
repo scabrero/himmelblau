@@ -374,6 +374,7 @@ FILE_REPLACE = {
         "usr/share/selinux": "%{_selinux_sharedir}",
         "usr/share/doc/himmelblau-selinux/selinux": "%{_selinux_docdir}",
         "usr/lib/systemd/system": "%{_unitdir}",
+        "usr/lib/systemd/user": "%{_userunitdir}",
         "usr/lib/himmelblau": "%{_prefix}/lib/himmelblau",
         "usr/share/icons": "%{_iconsdir}",
         "usr/share": "%{_datadir}",
@@ -851,6 +852,7 @@ strip --strip-unneeded target/release/libpam_himmelblau.so
 install -D -d -m 0755 %{{buildroot}}%{{_sbindir}}
 install -D -d -m 0755 %{{buildroot}}%{{_bindir}}
 install -D -d -m 0755 %{{buildroot}}%{{_unitdir}}
+install -D -d -m 0755 %{{buildroot}}%{{_userunitdir}}
 install -D -d -m 0755 %{{buildroot}}%{{_prefix}}/lib/himmelblau
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/ssh/sshd_config.d
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/krb5.conf.d
