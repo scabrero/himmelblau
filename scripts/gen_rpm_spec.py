@@ -346,6 +346,9 @@ def file_line(asset, dest_replace):
     # Man pages may be compressed, so use wildcard
     if "%{_mandir}" in dest or "/man/man" in dest:
         suffix = "*"
+    # Make sure files lines are absolute paths
+    if not dest.startswith(("/", "%")):
+        dest = "/" + dest
     return f"{prefix}{dest}{suffix}"
 
 def apply_path_replacements(path: str, dest_replace: dict[str, str]) -> str:
