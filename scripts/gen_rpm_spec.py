@@ -734,6 +734,7 @@ BuildRequires:  patchelf
 BuildRequires:  systemd-rpm-macros
 %if 0%{{?suse_version}}
 BuildRequires:  ca-certificates-mozilla
+BuildRequires:  fdupes
 BuildRequires:  nodejs-default
 %else
 BuildRequires:  nodejs
@@ -894,7 +895,10 @@ if [ -d target/release/locale ]; then
         install -D -m 0644 "$mo" "%{{buildroot}}%{{_datadir}}/locale/$lang/LC_MESSAGES/himmelblau.mo"
     done
 fi
-%find_lang himmelblau || touch himmelblau.lang
+%if 0%{{?suse_version}}
+%fdupes %{{buildroot}}%{{_datadir}}/locale
+%endif
+%find_lang himmelblau
 
 # SSHD Config
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/ssh/sshd_config.d
