@@ -731,6 +731,13 @@ BuildRequires:  cargo-packaging
 BuildRequires:  clang-devel
 BuildRequires:  patchelf
 BuildRequires:  systemd-rpm-macros
+%if 0%{{?suse_version}}
+BuildRequires:  ca-certificates-mozilla
+BuildRequires:  nodejs-default
+%else
+BuildRequires:  nodejs
+%endif
+BuildRequires:  ca-certificates
 {generate_build_requires(deps[args.target]['packages'])}
 ExclusiveArch:  %{{rust_tier1_arches}}
 {dep_gen(himmelblau_metadata)}
