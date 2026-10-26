@@ -733,6 +733,7 @@ BuildRequires:  patchelf
 BuildRequires:  systemd-rpm-macros
 %if 0%{{?suse_version}}
 BuildRequires:  ca-certificates-mozilla
+BuildRequires:  fdupes
 BuildRequires:  nodejs-default
 %else
 BuildRequires:  nodejs
@@ -879,13 +880,21 @@ pushd %{{buildroot}}%{{_sbindir}}
 ln -s himmelblaud rchimmelblaud
 ln -s himmelblaud_tasks rchimmelblaud_tasks
 popd
-if [ -d target/release/locale ]; then
-    find target/release/locale -name himmelblau.mo -print | while IFS= read -r mo; do
-        lang="$(basename "$(dirname "$(dirname "$mo")")")"
-        install -D -m 0644 "$mo" "%{{buildroot}}%{{_datadir}}/locale/$lang/LC_MESSAGES/himmelblau.mo"
-    done
-fi
-%find_lang himmelblau || touch himmelblau.lang
+
+install -d %{{buildroot}}%{{_datadir}}/locale
+cp -a target/release/locale/. %{{buildroot}}%{{_datadir}}/locale/
+find %{{buildroot}}%{{_datadir}}/locale -type f -exec chmod 0644 {{}} +
+
+# Aliases for bare language codes that have no catalog of their own
+install -D -m 0644 target/release/locale/pt_BR/LC_MESSAGES/himmelblau.mo \
+  %{{buildroot}}%{{_datadir}}/locale/pt/LC_MESSAGES/himmelblau.mo
+install -D -m 0644 target/release/locale/sr@latin/LC_MESSAGES/himmelblau.mo \
+  %{{buildroot}}%{{_datadir}}/locale/sr/LC_MESSAGES/himmelblau.mo
+%if 0%{{?suse_version}}
+%fdupes %{{buildroot}}%{{_datadir}}/locale
+%endif
+
+%find_lang himmelblau
 
 # SSHD Config
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/ssh/sshd_config.d
