@@ -1,8 +1,23 @@
 #!/bin/sh
 set -e
 
-if ! command -v deb-systemd-helper >/dev/null 2>&1; then
-%systemd_pre himmelblaud.service himmelblaud-tasks.service
+is_debian_family() {
+    (
+        for f in /etc/os-release /usr/lib/os-release; do
+            if [ -r "$f" ]; then
+                . "$f"
+                break
+            fi
+        done
+        case " ${ID:-} ${ID_LIKE:-} " in
+            *" debian "*|*" ubuntu "*) exit 0 ;;
+        esac
+        exit 1
+    )
+}
+
+if ! is_debian_family; then
+    %systemd_pre himmelblaud.service himmelblaud.socket himmelblaud-tasks.service himmelblaud-tasks.socket himmelblaud-broker.socket himmelblau-hsm-pin-init.service
 fi
 
 # Remove old service files from /etc/systemd/system/ that were installed by v1.4.x

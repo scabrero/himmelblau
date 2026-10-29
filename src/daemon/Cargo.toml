@@ -147,6 +147,8 @@ assets = [
   { source = "../../platform/opensuse/himmelblau-hsm-pin-init.service", dest = "/usr/lib/systemd/system/", mode = "644" },
   { source = "../../platform/opensuse/himmelblau-compliance-check.service", dest = "/usr/lib/systemd/user/", mode = "644" },
   { source = "../../platform/opensuse/himmelblau-compliance-check.timer", dest = "/usr/lib/systemd/user/", mode = "644" },
+  { source = "../../platform/opensuse/himmelblau.preset", dest = "/usr/lib/systemd/system-preset/50-himmelblau.preset", mode = "644" },
+  { source = "../../platform/opensuse/himmelblau-user.preset", dest = "/usr/lib/systemd/user-preset/50-himmelblau.preset", mode = "644" },
   { source = "scripts/himmelblau-init-hsm-pin", dest = "/usr/libexec/", mode = "755" },
   { source = "target/release/himmelblaud", dest = "/usr/sbin/", mode = "755" },
   { source = "target/release/himmelblaud_tasks", dest = "/usr/sbin/", mode = "755" },

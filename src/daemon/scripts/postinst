@@ -1,6 +1,21 @@
 #!/bin/sh
 set -e
 
+is_debian_family() {
+    (
+        for f in /etc/os-release /usr/lib/os-release; do
+            if [ -r "$f" ]; then
+                . "$f"
+                break
+            fi
+        done
+        case " ${ID:-} ${ID_LIKE:-} " in
+            *" debian "*|*" ubuntu "*) exit 0 ;;
+        esac
+        exit 1
+    )
+}
+
 # Detect if running on a Live system where service start should be skipped
 is_live_system() {
     # Check common Live system indicators
@@ -36,18 +51,13 @@ selinux_policy_loaded() {
     semodule -l 2>/dev/null | awk '{print $1}' | grep -qx himmelblaud
 }
 
-skip_start=0
-if ! selinux_policy_loaded; then
-    skip_start=1
-fi
-
 # Ensure cache directory is created with correct permissions
 systemd-tmpfiles --create /usr/lib/tmpfiles.d/himmelblau-policies.conf 2>/dev/null || true
 
 # Ensure private data directory is created with correct permissions
 systemd-tmpfiles --create /usr/lib/tmpfiles.d/himmelblaud.conf 2>/dev/null || true
 
-if command -v deb-systemd-helper >/dev/null 2>&1; then
+if is_debian_family; then
     if [ "$1" != "configure" ]; then
         exit 0
     fi
@@ -66,12 +76,16 @@ if command -v deb-systemd-helper >/dev/null 2>&1; then
         deb-systemd-helper update-state himmelblaud.service himmelblaud-tasks.service himmelblau-hsm-pin-init.service >/dev/null || true
     fi
 
-    if [ -z "$DPKG_ROOT" ] && [ -d /run/systemd/system ] && ! is_live_system; then
-        deb-systemd-invoke daemon-reload --system >/dev/null || true
-        if [ "$skip_start" -eq 1 ]; then
-            echo "SELinux enabled but himmelblaud policy not loaded yet; deferring service start"
+    if [ -z "$DPKG_ROOT" ] && [ -d /run/systemd/system ]; then
+        if is_live_system; then
+            echo "Live system detected - skipping service start (HSM PIN will be initialized at first boot)"
         else
-            deb-systemd-invoke restart himmelblaud.service himmelblaud-tasks.service >/dev/null || true
+            deb-systemd-invoke daemon-reload --system >/dev/null || true
+            if ! selinux_policy_loaded; then
+                echo "SELinux enabled but himmelblaud policy not loaded yet; deferring service start"
+            else
+                deb-systemd-invoke restart himmelblaud.service himmelblaud-tasks.service >/dev/null || true
+            fi
         fi
     fi
 
@@ -84,33 +98,21 @@ if command -v deb-systemd-helper >/dev/null 2>&1; then
         # cleaned up on purge. Also remove old symlinks.
         deb-systemd-helper --user update-state himmelblau-compliance-check.timer >/dev/null || true
     fi
-elif command -v systemctl >/dev/null 2>&1; then
-    # Reload systemd to pick up the new service files from /usr/lib/systemd/system/
-    systemctl daemon-reload || true
+else
+    # Presets the units; the restart on upgrade is done in the postun scriptlet.
+    %systemd_post himmelblaud.service himmelblaud.socket himmelblaud-tasks.service himmelblaud-tasks.socket himmelblaud-broker.socket himmelblau-hsm-pin-init.service
+    %systemd_user_post himmelblau-compliance-check.timer
 
-    # Enable and start Himmelblau daemons if systemd is available
-    # On Live systems, skip service start - the HSM PIN will be generated at first boot
-    # via the himmelblau-hsm-pin-init.service oneshot when deployed to real hardware.
-    if is_live_system; then
-        echo "Live system detected - skipping service start (HSM PIN will be initialized at first boot)"
-        # Only enable services so they start on first real boot
-        systemctl enable himmelblaud.service himmelblaud-tasks.service 2>/dev/null || true
-        # Enable HSM PIN init service separately (may not exist on older systemd)
-        systemctl enable himmelblau-hsm-pin-init.service 2>/dev/null || true
-    else
-        echo "Enabling and starting Himmelblau services..."
-        systemctl enable himmelblaud.service himmelblaud-tasks.service 2>/dev/null || true
-        # Enable HSM PIN init service separately (may not exist on older systemd)
-        systemctl enable himmelblau-hsm-pin-init.service 2>/dev/null || true
-        if [ "$skip_start" -eq 1 ]; then
+    # The preset above never starts anything, so start the daemons on a fresh install.
+    if [ "$1" -eq 1 ] && [ -d /run/systemd/system ]; then
+        if is_live_system; then
+            echo "Live system detected - skipping service start (HSM PIN will be initialized at first boot)"
+        elif ! selinux_policy_loaded; then
             echo "SELinux enabled but himmelblaud policy not loaded yet; deferring service start"
         else
-            systemctl restart himmelblaud.service himmelblaud-tasks.service 2>/dev/null || true
+            systemctl start himmelblaud.service himmelblaud-tasks.service >/dev/null 2>&1 || true
         fi
     fi
-
-    # Globally enable user timer for compliance checks (does not start existing sessions)
-    systemctl --global enable himmelblau-compliance-check.timer 2>/dev/null || true
 fi
 
 echo "Support Himmelblau: Financial support helps keep cloud identity for Linux open."

@@ -1,10 +1,11 @@
 #!/bin/sh
+
 set -e
 
 config_file="/etc/himmelblau/himmelblau.conf"
 saved_config="${config_file}.rpmsave"
 
-# RPM creates .rpmsave after %post when an owned config is removed during an
+# RPM creates .rpmsave after the post scriptlet when an owned config is removed during an
 # upgrade, so recover the previous local configuration at transaction end.
 if [ -f "$saved_config" ] && [ ! -e "$config_file" ] && [ ! -L "$config_file" ]; then
     echo "Restoring Himmelblau configuration from $saved_config"

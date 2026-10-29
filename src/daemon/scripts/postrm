@@ -1,35 +1,88 @@
 #!/bin/sh
 set -e
 
-if [ -d /run/systemd/system ]; then
-    if command -v deb-systemd-invoke >/dev/null 2>&1; then
-        if [ -z "$DPKG_ROOT" ] && [ "$1" = remove ]; then
-            deb-systemd-invoke daemon-reload --system >/dev/null || true
-        fi
-    elif command -v systemctl >/dev/null 2>&1; then
-        systemctl daemon-reload --system >/dev/null || true
+is_debian_family() {
+    (
+        for f in /etc/os-release /usr/lib/os-release; do
+            if [ -r "$f" ]; then
+                . "$f"
+                break
+            fi
+        done
+        case " ${ID:-} ${ID_LIKE:-} " in
+            *" debian "*|*" ubuntu "*) exit 0 ;;
+        esac
+        exit 1
+    )
+}
+
+# Detect if running on a Live system where service start should be skipped
+is_live_system() {
+    # Check common Live system indicators
+    grep -q 'boot=live' /proc/cmdline 2>/dev/null && return 0
+    grep -q 'rd.live' /proc/cmdline 2>/dev/null && return 0
+    [ -d /run/live ] && return 0
+    [ -f /.live-installer ] && return 0
+    # Check if running in a container (dracut/systemd-nspawn)
+    systemd-detect-virt -c -q 2>/dev/null && return 0
+    return 1
+}
+
+# Determine if SELinux policy for himmelblaud is loaded.
+# Returns success if SELinux is disabled or the policy is already loaded.
+selinux_policy_loaded() {
+    if ! command -v selinuxenabled >/dev/null 2>&1; then
+        return 0
     fi
-fi
+
+    if ! selinuxenabled; then
+        return 0
+    fi
+
+    # If the policy sources are not installed, don't block service start.
+    if [ ! -d /usr/share/selinux/packages/himmelblaud ]; then
+        return 0
+    fi
+
+    if ! command -v semodule >/dev/null 2>&1; then
+        return 1
+    fi
+
+    semodule -l 2>/dev/null | awk '{print $1}' | grep -qx himmelblaud
+}
 
 # On full uninstall (purge on Debian, $1=0 on RPM): remove all runtime data,
 # caches, and AccountsService entries for Entra users so GDM stops listing them.
 _is_full_remove=0
-if [ "${1:-}" = "purge" ]; then _is_full_remove=1; fi   # Debian purge
-if [ "${1:-1}" = "0" ]; then _is_full_remove=1; fi       # RPM full remove
+if is_debian_family; then
+    if [ "${1:-}" = "purge" ]; then _is_full_remove=1; fi
+else
+    if [ "${1:-1}" = "0" ]; then _is_full_remove=1; fi
+fi
 
-if [ "$_is_full_remove" = "1" ]; then
-    if command -v deb-systemd-helper >/dev/null 2>&1; then
-        if [ -z "$DPKG_ROOT" ]; then
-            deb-systemd-helper purge himmelblaud.service himmelblaud-tasks.service himmelblau-hsm-pin-init.service >/dev/null || true
-            deb-systemd-helper --user purge himmelblau-compliance-check.timer >/dev/null || true
-        fi
-    elif command -v systemctl >/dev/null 2>&1; then
-        systemctl disable himmelblaud.service himmelblaud-tasks.service himmelblau-hsm-pin-init.service >/dev/null || true
-        if [ -z "$DPKG_ROOT" ]; then
-            systemctl --global disable himmelblau-compliance-check.timer 2>/dev/null || true
-        fi
+if is_debian_family; then
+    if [ -d /run/systemd/system ] && [ -z "$DPKG_ROOT" ] && [ "$1" = remove ]; then
+        deb-systemd-invoke daemon-reload --system >/dev/null || true
     fi
 
+    if [ "$_is_full_remove" = "1" ] && [ -z "$DPKG_ROOT" ]; then
+        deb-systemd-helper purge himmelblaud.service himmelblaud-tasks.service himmelblau-hsm-pin-init.service >/dev/null || true
+        deb-systemd-helper --user purge himmelblau-compliance-check.timer >/dev/null || true
+    fi
+else
+    # Restarting on upgrade is done here (not in the post scriptlet) to avoid a double restart.
+    if is_live_system; then
+        echo "Live system detected - skipping service restart"
+        %systemd_postun himmelblaud.service himmelblaud.socket himmelblaud-tasks.service himmelblaud-tasks.socket himmelblaud-broker.socket himmelblau-hsm-pin-init.service
+    elif ! selinux_policy_loaded; then
+        echo "SELinux enabled but himmelblaud policy not loaded yet; skipping service restart"
+        %systemd_postun himmelblaud.service himmelblaud.socket himmelblaud-tasks.service himmelblaud-tasks.socket himmelblaud-broker.socket himmelblau-hsm-pin-init.service
+    else
+        %systemd_postun_with_restart himmelblaud.service himmelblaud.socket himmelblaud-tasks.service himmelblaud-tasks.socket himmelblaud-broker.socket himmelblau-hsm-pin-init.service
+    fi
+fi
+
+if [ "$_is_full_remove" = "1" ]; then
     rm -rf /var/cache/himmelblaud/
     rm -rf /var/cache/nss-himmelblau/
     rm -rf /var/cache/himmelblau-policies/

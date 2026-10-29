@@ -385,6 +385,8 @@ FILE_REPLACE = {
         "usr/share/selinux/packages": "%{_selinux_pkgdir}",
         "usr/share/selinux": "%{_selinux_sharedir}",
         "usr/share/doc/himmelblau-selinux/selinux": "%{_selinux_docdir}",
+        "usr/lib/systemd/system-preset": "%{_presetdir}",
+        "usr/lib/systemd/user-preset": "%{_userpresetdir}",
         "usr/lib/systemd/system": "%{_unitdir}",
         "usr/lib/systemd/user": "%{_userunitdir}",
         "usr/lib/himmelblau": "%{_prefix}/lib/himmelblau",
@@ -873,6 +875,8 @@ install -D -d -m 0755 %{{buildroot}}%{{_sbindir}}
 install -D -d -m 0755 %{{buildroot}}%{{_bindir}}
 install -D -d -m 0755 %{{buildroot}}%{{_unitdir}}
 install -D -d -m 0755 %{{buildroot}}%{{_userunitdir}}
+install -D -d -m 0755 %{{buildroot}}%{{_presetdir}}
+install -D -d -m 0755 %{{buildroot}}%{{_userpresetdir}}
 install -D -d -m 0755 %{{buildroot}}%{{_prefix}}/lib/himmelblau
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/ssh/sshd_config.d
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/krb5.conf.d
@@ -950,7 +954,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_script_sections(pam_metadata, name="pam-himmelblau")}
 
-{generate_script_sections(himmelblau_metadata, name=None, extras={"post_uninstall_script": "%service_del_postun himmelblaud.service himmelblaud-tasks.service", "pre_uninstall_script": "%service_del_preun himmelblaud.service himmelblaud-tasks.service", "post_install_script": "%service_add_post himmelblaud.service himmelblaud-tasks.service", "pre_install_script": "%service_add_pre himmelblaud.service himmelblaud-tasks.service"})}
+{generate_script_sections(himmelblau_metadata, name=None, extras={})}
 
 {generate_script_sections(sshd_metadata, name="himmelblau-sshd-config")}
 
