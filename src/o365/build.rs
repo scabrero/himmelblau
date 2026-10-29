@@ -41,7 +41,7 @@ fn apps() -> Vec<App> {
             name: "Outlook",
             slug: "outlook",
             url: "https://outlook.office.com/mail/",
-            categories: "Office;Calendar;Contacts;Email;Network;",
+            categories: "Office;Calendar;ContactManagement;Email;Network;",
             multi: false,
             url_handler: true,
         },
