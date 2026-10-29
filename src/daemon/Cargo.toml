@@ -159,6 +159,7 @@ assets = [
   { source = "src/himmelblau-policies.tmpfiles.conf", dest = "/usr/lib/tmpfiles.d/himmelblau-policies.conf", mode = "644" },
   { source = "src/himmelblaud.tmpfiles.conf", dest = "/usr/lib/tmpfiles.d/himmelblaud.conf", mode = "644" },
 ]
+pre_install_script = "scripts/preinst"
 post_install_script = "scripts/postinst"
 post_trans_script = "scripts/posttrans"
 pre_uninstall_script = "scripts/prerm"
