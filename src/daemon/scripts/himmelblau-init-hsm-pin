@@ -5,9 +5,13 @@
 
 set -e
 
-LEGACY=/var/lib/private/himmelblaud/hsm-pin
-LEGACY1=/var/lib/private/himmelblaud/hsm-pin.enc
-CRED=/var/lib/private/himmelblaud/hsm-pin-nopcr.enc
+# The state directory is created and owned by systemd (StateDirectory= in
+# himmelblau-hsm-pin-init.service), do not create it here. With DynamicUser=
+# /var/lib/himmelblaud is a symlink to /var/lib/private/himmelblaud.
+STATE_DIR=/var/lib/himmelblaud
+LEGACY=$STATE_DIR/hsm-pin
+LEGACY1=$STATE_DIR/hsm-pin.enc
+CRED=$STATE_DIR/hsm-pin-nopcr.enc
 SRK_HANDLE=0x81000001
 
 gen_pin_hex() {
@@ -99,9 +103,11 @@ provision_srk() {
     return 0
 }
 
-# Ensure the directory exists
-mkdir -p /var/lib/private/himmelblaud
-chmod 700 /var/lib/private/himmelblaud
+# The directory is set up by systemd when the unit starts
+if [ ! -d "$STATE_DIR" ]; then
+    echo "ERROR: $STATE_DIR does not exist, run: systemctl start himmelblau-hsm-pin-init.service"
+    exit 1
+fi
 
 # Check if systemd-creds is available
 if ! command -v systemd-creds >/dev/null 2>&1; then

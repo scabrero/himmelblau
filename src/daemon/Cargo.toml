@@ -57,7 +57,7 @@ zbus = { workspace = true }
 [package.metadata.deb]
 name = "himmelblau"
 maintainer = "David Mulder <dmulder@suse.com>"
-depends = ["$auto"]
+depends = ["$auto", "systemd (>= 235)"]
 recommends = ["nss-himmelblau", "pam-himmelblau", "krb5-user", "cron", "tpm2-tools", "himmelblau-apparmor"]
 suggests = ["himmelblau-orchestrator"]
 assets = [
@@ -82,7 +82,6 @@ assets = [
   ["../../man/man8/himmelblaud.8", "usr/share/man/man8/", "644"],
   ["../../man/man8/himmelblaud_tasks.8", "usr/share/man/man8/", "644"],
   ["src/himmelblau-policies.tmpfiles.conf", "usr/lib/tmpfiles.d/himmelblau-policies.conf", "644"],
-  ["src/himmelblaud.tmpfiles.conf", "usr/lib/tmpfiles.d/himmelblaud.conf", "644"],
   # For each language in po/LINGUAS, add:
   ["target/release/locale/de/LC_MESSAGES/himmelblau.mo", "usr/share/locale/de/LC_MESSAGES/", "644"],
   ["target/release/locale/fr/LC_MESSAGES/himmelblau.mo", "usr/share/locale/fr/LC_MESSAGES/", "644"],
@@ -159,7 +158,6 @@ assets = [
   { source = "../../man/man8/himmelblaud.8", dest = "/usr/share/man/man8/", mode = "644" },
   { source = "../../man/man8/himmelblaud_tasks.8", dest = "/usr/share/man/man8/", mode = "644" },
   { source = "src/himmelblau-policies.tmpfiles.conf", dest = "/usr/lib/tmpfiles.d/himmelblau-policies.conf", mode = "644" },
-  { source = "src/himmelblaud.tmpfiles.conf", dest = "/usr/lib/tmpfiles.d/himmelblaud.conf", mode = "644" },
 ]
 pre_install_script = "scripts/preinst"
 post_install_script = "scripts/postinst"
@@ -191,6 +189,7 @@ himmelblau-orchestrator = "*"
 
 [package.metadata.generate-rpm.requires]
 man = ""
+systemd = ">= 235"
 
 [package.metadata.cargo-machete]
 ignored = ["libhimmelblau"]

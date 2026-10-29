@@ -349,7 +349,21 @@ WantedBy=multi-user.target
     # ---- Compose himmelblau-hsm-pin-init.service ----
     # Always generate this file so cargo-deb can find it. On older systemd without
     # LoadCredentialEncrypted support, the service won't be started by himmelblaud.service.
-    hsm_pin_init_unit = """\
+    # The oneshot declares the same user and StateDirectory= as himmelblaud.service,
+    # so systemd creates and owns the state directory (including the DynamicUser=
+    # private/ handling and the migration of pre-existing directories) instead of
+    # the script. ExecStart=+ runs the script as root with no sandboxing, while the
+    # directory is still set up for the configured user.
+    hsm_pin_init_service_lines = [
+        "Type=oneshot",
+        *[l for l in service_user_block if not l.startswith("SupplementaryGroups=")],
+    ]
+    if supported("CacheRuntimeStateDirs"):
+        hsm_pin_init_service_lines.append("StateDirectory=himmelblaud")
+    hsm_pin_init_service_lines.append("ExecStart=+/usr/libexec/himmelblau-init-hsm-pin")
+    hsm_pin_init_service = os.linesep.join(hsm_pin_init_service_lines)
+
+    hsm_pin_init_unit = f"""\
 # You should not need to edit this file. Instead, use a drop-in file:
 #   systemctl edit himmelblau-hsm-pin-init.service
 
@@ -363,11 +377,10 @@ DefaultDependencies=no
 # Wants= (not Requires=) so we degrade gracefully on TPM-less systems.
 After=local-fs.target systemd-tpm2-setup.service
 Wants=systemd-tpm2-setup.service
-ConditionPathExists=!/var/lib/private/himmelblaud/hsm-pin-nopcr.enc
+ConditionPathExists=!/var/lib/himmelblaud/hsm-pin-nopcr.enc
 
 [Service]
-Type=oneshot
-ExecStart=/usr/libexec/himmelblau-init-hsm-pin
+{hsm_pin_init_service}
 
 [Install]
 WantedBy=himmelblaud.service

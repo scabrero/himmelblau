@@ -228,7 +228,12 @@ def merge_metadata(crate_names: list[str], metadata: list[dict], repo_root: Path
                 res["generate_rpm"][key] = body
         for rel in REL_KEYS:
             if rel in crate["generate_rpm"]:
-                res["generate_rpm"][rel].extend(list(crate["generate_rpm"][rel].keys()))
+                for name, version in crate["generate_rpm"][rel].items():
+                    # cargo-generate-rpm takes the version constraint as the value
+                    # ("" and "*" mean any version)
+                    if version and version != "*":
+                        name = f"{name} {version}"
+                    res["generate_rpm"][rel].append(name)
     return res
 
 def load_gen_dockerfiles(py_path: Path):
@@ -967,7 +972,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {apparmor_scripts_section}
 
-{generate_files_section(himmelblau_metadata, name=None, dirs=["%{_prefix}/lib/himmelblau", "%ghost %dir %attr(0600,root,root) %{_localstatedir}/cache/himmelblau-policies", "%{_unitdir}/display-manager.service.d", "%{_datadir}/doc/himmelblau", "%{_docdir}/himmelblau-selinux", "%{_selinux_docdir}"], extras=["%{_sbindir}/rchimmelblaud", "%{_sbindir}/rchimmelblaud_tasks", "%ghost %dir %attr(0700,root,root) /var/lib/private/himmelblaud"], lang_file="himmelblau.lang")}
+{generate_files_section(himmelblau_metadata, name=None, dirs=["%{_prefix}/lib/himmelblau", "%ghost %dir %attr(0600,root,root) %{_localstatedir}/cache/himmelblau-policies", "%{_unitdir}/display-manager.service.d", "%{_datadir}/doc/himmelblau", "%{_docdir}/himmelblau-selinux", "%{_selinux_docdir}"], extras=["%{_sbindir}/rchimmelblaud", "%{_sbindir}/rchimmelblaud_tasks"], lang_file="himmelblau.lang")}
 
 {generate_files_section(nss_metadata, name="libnss_himmelblau2", dirs=["%{_tmpfilesdir}"], extras=["%ghost %dir %attr(0755,root,root) /var/cache/nss-himmelblau"])}
 

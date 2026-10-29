@@ -10,7 +10,7 @@ is_debian_family() {
             fi
         done
         case " ${ID:-} ${ID_LIKE:-} " in
-            *" debian "*|*" ubuntu "*) exit 0 ;;
+        *" debian "* | *" ubuntu "*) exit 0 ;;
         esac
         exit 1
     )
@@ -53,9 +53,6 @@ selinux_policy_loaded() {
 
 # Ensure cache directory is created with correct permissions
 systemd-tmpfiles --create /usr/lib/tmpfiles.d/himmelblau-policies.conf 2>/dev/null || true
-
-# Ensure private data directory is created with correct permissions
-systemd-tmpfiles --create /usr/lib/tmpfiles.d/himmelblaud.conf 2>/dev/null || true
 
 if is_debian_family; then
     if [ "$1" != "configure" ]; then

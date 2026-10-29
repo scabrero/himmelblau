@@ -23,7 +23,7 @@ _workspace_version() {
       printf '%s' "${line%\"*}"
       return
     fi
-  done < "$_repo/Cargo.toml"
+  done <"$_repo/Cargo.toml"
 }
 
 pkgname=himmelblau
@@ -143,8 +143,6 @@ package() {
   install -Dm644 src/config/gdm3_service_override.conf \
     "$pkgdir/usr/lib/systemd/system/display-manager.service.d/override.conf"
 
-  install -Dm644 src/daemon/src/himmelblaud.tmpfiles.conf \
-    "$pkgdir/usr/lib/tmpfiles.d/himmelblaud.conf"
   install -Dm644 src/daemon/src/himmelblau-policies.tmpfiles.conf \
     "$pkgdir/usr/lib/tmpfiles.d/himmelblau-policies.conf"
 
@@ -210,7 +208,7 @@ package() {
   local greeter='qr-greeter@himmelblau-idm.org'
   local asset
   for asset in extension.js qrcodegen.js qrselection.js metadata.json \
-               stylesheet.css security-key.svg security-key-touch.svg; do
+    stylesheet.css security-key.svg security-key-touch.svg; do
     install -Dm644 "target/release/qr-greeter-build/$greeter/$asset" \
       "$pkgdir/usr/share/gnome-shell/extensions/$greeter/$asset"
   done
