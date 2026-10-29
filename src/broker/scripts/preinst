@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+is_debian_family() {
+    (
+        for f in /etc/os-release /usr/lib/os-release; do
+            if [ -r "$f" ]; then
+                . "$f"
+                break
+            fi
+        done
+        case " ${ID:-} ${ID_LIKE:-} " in
+            *" debian "*|*" ubuntu "*) exit 0 ;;
+        esac
+        exit 1
+    )
+}
+
+if ! is_debian_family; then
+    %systemd_user_pre himmelblau-broker.service
+fi

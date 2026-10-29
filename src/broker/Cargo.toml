@@ -43,6 +43,7 @@ assets = [
   { source = "./platform/com.microsoft.identity.broker1.service", dest = "/usr/share/dbus-1/services/", mode = "644" },
   { source = "./platform/himmelblau-broker.service", dest = "/usr/lib/systemd/user/", mode = "644" },
 ]
+pre_install_script = "scripts/preinst"
 post_install_script = "scripts/postinst"
 pre_uninstall_script = "scripts/prerm"
 post_uninstall_script = "scripts/postrm"
