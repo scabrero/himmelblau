@@ -937,8 +937,8 @@ install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/xdg/autostart
 
 # SSO Policies
 install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/firefox/policies
-install -D -d -m 0555 %{{buildroot}}%{{chrome_policy_dir}}
-install -D -d -m 0555 %{{buildroot}}%{{chromium_policy_dir}}
+install -D -d -m 0755 %{{buildroot}}%{{chrome_policy_dir}}
+install -D -d -m 0755 %{{buildroot}}%{{chromium_policy_dir}}
 {generate_install_section(sso_policies_metadata)}
 
 # QR Greeter
@@ -975,11 +975,11 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_files_section(broker_metadata, name="himmelblau-broker", extras=["%{_sbindir}/rchimmelblau_broker"])}
 
-{generate_files_section(sso_metadata, name="himmelblau-sso", dirs=["%{_libdir}/mozilla", "%{_libdir}/mozilla/native-messaging-hosts", "/etc/chromium", "/etc/chromium/native-messaging-hosts", "/usr/share/google-chrome", "%{chrome_nm_dir}", "%{chromium_nm_dir}", "%{chrome_ext_dir}", "%{_iconsdir}/hicolor", "%{_iconsdir}/hicolor/256x256", "%{_iconsdir}/hicolor/256x256/apps"])}
+{generate_files_section(sso_metadata, name="himmelblau-sso", dirs=["%{_libdir}/mozilla", "%{_libdir}/mozilla/native-messaging-hosts", "/etc/chromium", "/usr/share/google-chrome", "%{chrome_nm_dir}", "%{chromium_nm_dir}", "%{chrome_ext_dir}", "%{_iconsdir}/hicolor", "%{_iconsdir}/hicolor/256x256", "%{_iconsdir}/hicolor/256x256/apps"])}
 
 {generate_files_section(collabora_metadata, name="himmelblau-collabora")}
 
-{generate_files_section(sso_policies_metadata, name="himmelblau-sso-policies", dirs=["/etc/firefox", "/etc/firefox/policies", "/etc/chromium/policies", "/etc/chromium/policies/managed", "/etc/opt/chrome", "/etc/opt/chrome/policies", "/etc/opt/chrome/policies/managed", "%attr(0555,root,root) %{chrome_policy_dir}", "%attr(0555,root,root) %{chromium_policy_dir}"])}
+{generate_files_section(sso_policies_metadata, name="himmelblau-sso-policies", dirs=["/etc/firefox", "/etc/firefox/policies", "/etc/chromium/policies", "/etc/opt/chrome", "/etc/opt/chrome/policies", "%attr(0555,root,root) %{chrome_policy_dir}", "%attr(0555,root,root) %{chromium_policy_dir}"])}
 
 {generate_files_section(qr_metadata, name="himmelblau-qr-greeter", dirs=["%{_datarootdir}/gnome-shell", "%{_datarootdir}/gnome-shell/extensions", "%{_datarootdir}/gnome-shell/extensions/qr-greeter@himmelblau-idm.org"])}
 
