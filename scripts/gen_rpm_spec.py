@@ -964,7 +964,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_files_section(himmelblau_metadata, name=None, dirs=["%{_prefix}/lib/himmelblau", "%{_localstatedir}/cache/himmelblau-policies", "%{_unitdir}/display-manager.service.d", "%{_datadir}/doc/himmelblau", "%{_docdir}/himmelblau-selinux", "%{_selinux_docdir}"], extras=["%{_sbindir}/rchimmelblaud", "%{_sbindir}/rchimmelblaud_tasks", "%ghost %dir %attr(0700,root,root) /var/lib/private/himmelblaud"], lang_file="himmelblau.lang")}
 
-{generate_files_section(nss_metadata, name="libnss_himmelblau2", dirs=["%{_tmpfilesdir}"], extras=["%ghost %attr(0755,root,root) /var/cache/nss-himmelblau"])}
+{generate_files_section(nss_metadata, name="libnss_himmelblau2", dirs=["%{_tmpfilesdir}"], extras=["%ghost %dir %attr(0755,root,root) /var/cache/nss-himmelblau"])}
 
 {generate_files_section(pam_metadata, name="pam-himmelblau", dirs=["/usr/lib/pam-config.d", "%{_datadir}/authselect", "%{_datadir}/authselect/vendor", "%{_datadir}/authselect/vendor/himmelblau"])}
 
