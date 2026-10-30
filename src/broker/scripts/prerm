@@ -1,8 +1,23 @@
 #!/bin/sh
 set -e
 
-if [ -d /run/systemd/system ]; then
-    if command -v deb-systemd-helper >/dev/null 2>&1; then
+is_debian_family() {
+    (
+        for f in /etc/os-release /usr/lib/os-release; do
+            if [ -r "$f" ]; then
+                . "$f"
+                break
+            fi
+        done
+        case " ${ID:-} ${ID_LIKE:-} " in
+            *" debian "*|*" ubuntu "*) exit 0 ;;
+        esac
+        exit 1
+    )
+}
+
+if is_debian_family; then
+    if [ -d /run/systemd/system ]; then
         if [ -z "$DPKG_ROOT" ] && [ "$1" = remove ]; then
             deb-systemd-invoke stop --user himmelblau-broker.service >/dev/null || true
         fi
