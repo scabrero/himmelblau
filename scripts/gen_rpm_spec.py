@@ -893,6 +893,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_sysconfdir}}/krb5.conf.d
 install -D -d -m 0755 %{{buildroot}}/%{{_unitdir}}/display-manager.service.d/
 install -d -m 0600 %{{buildroot}}%{{_localstatedir}}/cache/himmelblau-policies
 install -D -d -m 0755 %{{buildroot}}%{{_datadir}}/doc/himmelblau/
+install -D -d -m 0755 %{{buildroot}}%{{_datadir}}/doc/himmelblau-sso-policies/
 install -D -d -m 0755 %{{buildroot}}/%{{_tmpfilesdir}}/
 install -D -d -m 0755 %{{buildroot}}%{{_mandir}}/man1
 install -D -d -m 0755 %{{buildroot}}%{{_mandir}}/man5
@@ -990,7 +991,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_files_section(collabora_metadata, name="himmelblau-collabora")}
 
-{generate_files_section(sso_policies_metadata, name="himmelblau-sso-policies", dirs=["/etc/firefox", "/etc/firefox/policies", "/etc/chromium/policies", "/etc/opt/chrome", "/etc/opt/chrome/policies", "%attr(0555,root,root) %{chrome_policy_dir}", "%attr(0555,root,root) %{chromium_policy_dir}"])}
+{generate_files_section(sso_policies_metadata, name="himmelblau-sso-policies", dirs=["/etc/firefox", "/etc/firefox/policies", "/etc/chromium/policies", "/etc/opt/chrome", "/etc/opt/chrome/policies", "%attr(0555,root,root) %{chrome_policy_dir}", "%attr(0555,root,root) %{chromium_policy_dir}", "%{_datadir}/doc/himmelblau-sso-policies"])}
 
 {generate_files_section(qr_metadata, name="himmelblau-qr-greeter", dirs=["%{_datarootdir}/gnome-shell", "%{_datarootdir}/gnome-shell/extensions", "%{_datarootdir}/gnome-shell/extensions/qr-greeter@himmelblau-idm.org"])}
 
