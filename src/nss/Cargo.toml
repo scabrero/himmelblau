@@ -41,6 +41,7 @@ assets = [
 ]
 post_install_script = "scripts/postinst"
 pre_uninstall_script = "scripts/prerm"
+post_uninstall_script = "scripts/postrm"
 
 [package.metadata.generate-rpm.provides]
 libnss-aad = ""

@@ -291,6 +291,7 @@ def collect_zypper_deps(mod):
             "image": cfg.get("image"),
             "selinux": selinux,
             "apparmor": bool(cfg.get("apparmor", False)),
+            "nsswitch_config": bool(cfg.get("nsswitch_config", False)),
             "tpm": cfg.get("tpm", False),
         }
 
@@ -652,6 +653,19 @@ def main() -> int:
 
     himmelblau_metadata = merge_metadata(["himmelblaud", "selinux"], metadata, root)
     nss_metadata = merge_metadata(["nss_himmelblau"], metadata, root)
+    # The nsswitch.conf snippet is merged by nsswitch-config, which only exists on
+    # some targets. Elsewhere the NSS scriptlet edits /etc/nsswitch.conf.
+    nsswitch_config_enabled = bool(deps[args.target].get("nsswitch_config", False))
+    build_packages = list(deps[args.target]['packages'])
+    nss_scriptlet_requires = ""
+    if nsswitch_config_enabled:
+        nss_metadata["generate_rpm"]["assets"].append({
+            "source": "platform/opensuse/nsswitch-himmelblau.conf",
+            "dest": "/usr/share/nsswitch.conf.d/50-himmelblau.conf",
+            "mode": "644",
+        })
+        build_packages.append("nsswitch-config")
+        nss_scriptlet_requires = "\nRequires(post): nsswitch-config\nRequires(postun): nsswitch-config"
     pam_metadata = merge_metadata(["pam_himmelblau"], metadata, root)
     broker_metadata = merge_metadata(["broker"], metadata, root)
     sso_metadata = merge_metadata(["sso", "o365"], metadata, root)
@@ -755,7 +769,7 @@ BuildRequires:  nodejs-default
 %else
 BuildRequires:  nodejs
 %endif
-{generate_build_requires(deps[args.target]['packages'])}
+{generate_build_requires(build_packages)}
 ExclusiveArch:  %{{rust_tier1_arches}}
 {dep_gen(himmelblau_metadata)}
 
@@ -775,7 +789,7 @@ Suggests:       authselect
 Summary:        Azure Entra Id authentication NSS module
 Requires:       %{{name}} = %{{version}}
 Requires(post): /sbin/ldconfig
-Requires(postun): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig{nss_scriptlet_requires}
 {dep_gen(nss_metadata)}
 Provides:       nss-himmelblau
 

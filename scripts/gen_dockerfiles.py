@@ -467,6 +467,9 @@ DISTS = {
         },
         "tpm": True,
         "selinux": True,
+        # nsswitch-config merges /usr/share/nsswitch.conf.d snippets into
+        # /etc/nsswitch.conf, it is only available on Tumbleweed
+        "nsswitch_config": True,
     },
     # ---- Gentoo family ----
     # Gentoo generates an ebuild file instead of building binaries

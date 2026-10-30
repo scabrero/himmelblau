@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -eu
+
+# Regenerate nsswitch.conf without the snippet of this package
+if [ "${1:-1}" = "0" ] && command -v nsswitch-config >/dev/null 2>&1 &&
+   [ -e /etc/nsswitch.conf ] && nsswitch-config --is_generated >/dev/null 2>&1; then
+    nsswitch-config >/dev/null 2>&1 || :
+fi
