@@ -90,7 +90,8 @@ if [ "$_is_full_remove" = "1" ]; then
     rm -rf /var/cache/himmelblaud/
     rm -rf /var/cache/nss-himmelblau/
     rm -rf /var/cache/himmelblau-policies/
-    rm -rf /var/lib/himmelblaud/
+    rm -rf /var/lib/himmelblaud
+    rm -rf /var/lib/private/himmelblaud
 
     # Remove AccountsService entries for Entra users (UPN contains @)
     # so GDM stops showing them on the login screen.
