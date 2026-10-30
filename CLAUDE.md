@@ -173,7 +173,7 @@ Other utility crates:
 
 ## Platform integration (packaged system files) — `platform/` (DANGER ZONE)
 
-`platform/` contains distro integration files (systemd units, pam-config, authselect templates, maint scripts).
+`platform/` contains distro integration files (systemd units, pam-config, authselect templates, nsswitch.conf snippets, maint scripts).
 **Some of these are generated.**
 
 Before editing anything in `platform/`, first determine:
