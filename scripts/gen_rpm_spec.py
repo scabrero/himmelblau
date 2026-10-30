@@ -938,6 +938,8 @@ install -D -d -m 0755 %{{buildroot}}%{{_datadir}}/applications/
 %{{!?_iconsdir:%global _iconsdir %{{_datadir}}/icons}}
 install -D -d -m 0755 %{{buildroot}}%{{_iconsdir}}/hicolor/256x256/apps
 {generate_install_section(sso_metadata)}
+# The dependency generator does not resolve the interpreter of "env" scripts
+sed -i '1s|^#!/usr/bin/env bash$|#!/bin/bash|' %{{buildroot}}%{{_bindir}}/o365 %{{buildroot}}%{{_bindir}}/o365-multi %{{buildroot}}%{{_bindir}}/o365-url-handler
 
 # Collabora Office integration
 strip --strip-unneeded target/release/himmelblau-collabora
