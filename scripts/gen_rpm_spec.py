@@ -967,6 +967,8 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_script_sections(sshd_metadata, name="himmelblau-sshd-config")}
 
+{generate_script_sections(broker_metadata, name="himmelblau-broker")}
+
 {generate_script_sections(sso_metadata, name="himmelblau-sso")}
 
 {generate_script_sections(collabora_metadata, name="himmelblau-collabora")}
