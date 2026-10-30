@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import glob
 from datetime import datetime
 import json
 import os
@@ -193,9 +194,12 @@ def merge_metadata(crate_names: list[str], metadata: list[dict], repo_root: Path
         assets = []
         for asset in crate["generate_rpm"]["assets"]:
             src = asset["source"]
-            if src.startswith("target/") or src.startswith("platform/"):
+            if src.startswith("target/"):
                 assets.append(asset)
                 continue # target is already a path relative to the root
+            if src.startswith("platform/") and not glob.glob(str(crate_dir / src)):
+                assets.append(asset)
+                continue # not in the crate directory, relative to the root
             abs_src = (crate_dir / src).resolve()
             try:
                 rel_src = abs_src.relative_to(repo_root)
