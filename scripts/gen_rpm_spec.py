@@ -963,7 +963,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_script_sections(pam_metadata, name="pam-himmelblau")}
 
-{generate_script_sections(himmelblau_metadata, name=None, extras={"post_uninstall_script": "%service_del_postun himmelblaud.service himmelblaud-tasks.service", "pre_uninstall_script": "%service_del_preun himmelblaud.service himmelblaud-tasks.service", "post_install_script": "%service_add_post himmelblaud.service himmelblaud-tasks.service", "pre_install_script": "%service_add_pre himmelblaud.service himmelblaud-tasks.service"})}
+{generate_script_sections(himmelblau_metadata, name=None)}
 
 {generate_script_sections(sshd_metadata, name="himmelblau-sshd-config")}
 
