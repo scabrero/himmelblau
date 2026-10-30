@@ -40,8 +40,8 @@ maintainer-scripts = "scripts"
 name = "himmelblau-broker"
 assets = [
   { source = "target/release/broker", dest = "/usr/sbin/himmelblau_broker", mode = "755" },
-  { source = "platform/com.microsoft.identity.broker1.service", dest = "/usr/share/dbus-1/services/", mode = "644" },
-  { source = "platform/himmelblau-broker.service", dest = "/usr/lib/systemd/user/", mode = "644" },
+  { source = "./platform/com.microsoft.identity.broker1.service", dest = "/usr/share/dbus-1/services/", mode = "644" },
+  { source = "./platform/himmelblau-broker.service", dest = "/usr/lib/systemd/user/", mode = "644" },
 ]
 post_install_script = "scripts/postinst"
 pre_uninstall_script = "scripts/prerm"

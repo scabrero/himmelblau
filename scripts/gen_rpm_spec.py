@@ -908,7 +908,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/dbus-1/services
 strip --strip-unneeded target/release/broker
 {generate_install_section(broker_metadata)}
 pushd %{{buildroot}}%{{_sbindir}}
-ln -s broker rcbroker
+ln -s himmelblau_broker rchimmelblau_broker
 popd
 
 # Single Sign On
@@ -958,7 +958,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {generate_files_section(sshd_metadata, name="himmelblau-sshd-config", extras=["%if 0%{?sle_version} <= 150500\n%dir %{_sysconfdir}/ssh/sshd_config.d\n%endif"])}
 
-{generate_files_section(broker_metadata, name="himmelblau-broker", extras=["%{_sbindir}/rcbroker"])}
+{generate_files_section(broker_metadata, name="himmelblau-broker", extras=["%{_sbindir}/rchimmelblau_broker"])}
 
 {generate_files_section(sso_metadata, name="himmelblau-sso", dirs=["%{_libdir}/mozilla", "%{_libdir}/mozilla/native-messaging-hosts", "/etc/chromium", "/etc/chromium/native-messaging-hosts", "/usr/share/google-chrome", "%{chrome_nm_dir}", "%{chromium_nm_dir}", "%{chrome_ext_dir}", "%{_iconsdir}/hicolor", "%{_iconsdir}/hicolor/256x256", "%{_iconsdir}/hicolor/256x256/apps"])}
 
