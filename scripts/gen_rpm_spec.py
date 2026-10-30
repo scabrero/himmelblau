@@ -978,7 +978,7 @@ install -D -d -m 0755 %{{buildroot}}%{{_datarootdir}}/gnome-shell/extensions/qr-
 
 {apparmor_scripts_section}
 
-{generate_files_section(himmelblau_metadata, name=None, dirs=["%{_prefix}/lib/himmelblau", "%{_unitdir}/display-manager.service.d", "%{_datadir}/doc/himmelblau", "%{_docdir}/himmelblau-selinux", "%{_selinux_docdir}"], extras=["%{_sbindir}/rchimmelblaud", "%{_sbindir}/rchimmelblaud_tasks", "%ghost %dir /var/lib/private/himmelblaud", "%ghost %dir %attr(0600,root,root) %{_localstatedir}/cache/himmelblau-policies"], lang_file="himmelblau.lang")}
+{generate_files_section(himmelblau_metadata, name=None, dirs=["%{_prefix}/lib/himmelblau", "%{_unitdir}/display-manager.service.d", "%{_datadir}/doc/himmelblau", "%{_docdir}/himmelblau-selinux", "%{_selinux_docdir}"], extras=["%{_sbindir}/rchimmelblaud", "%{_sbindir}/rchimmelblaud_tasks", "%ghost %dir %attr(0600,root,root) %{_localstatedir}/cache/himmelblau-policies"], lang_file="himmelblau.lang")}
 
 {generate_files_section(nss_metadata, name="libnss_himmelblau2", dirs=["%{_tmpfilesdir}"], extras=["%ghost %dir %attr(0755,root,root) /var/cache/nss-himmelblau"])}
 
