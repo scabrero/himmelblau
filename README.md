@@ -299,9 +299,9 @@ sudo make uninstall   # removes installed Himmelblau packages
 It's essential that you configure the `domains` option, otherwise
 no users will be able to authenticate.
 
-Run the daemon with:
+Enable and run the daemon with:
 
-    sudo systemctl start himmelblaud himmelblaud-tasks
+    sudo systemctl enable --now himmelblaud himmelblaud-tasks
 
 Check systemd journal for errors.
 
