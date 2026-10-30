@@ -326,6 +326,14 @@ def install_line(asset, dest_replace):
     dest_dir, dest_name = os.path.split(dest)
     return f"install -m {mode} {src} %{{buildroot}}{dest}"
 
+ETC_PATH_PREFIXES = (
+    "%{_sysconfdir}",
+    "%{chrome_nm_dir}",
+    "%{chromium_nm_dir}",
+    "%{chrome_policy_dir}",
+    "%{chromium_policy_dir}",
+)
+
 def file_line(asset, dest_replace):
     dest = asset["dest"]
     if dest[0] == '/':
@@ -339,7 +347,8 @@ def file_line(asset, dest_replace):
     suffix = ""
     # Only files in /etc should be marked as %config
     # Check if dest is in /etc (via %{_sysconfdir} or literal etc/)
-    is_etc_file = dest.startswith("%{_sysconfdir}") or dest.startswith("etc/")
+    # The chrome and chromium directories are macros that expand to paths in /etc
+    is_etc_file = dest.startswith(ETC_PATH_PREFIXES) or dest.startswith("etc/")
     # Check if this is a man page or doc file - these should never be marked as config
     is_manpage = "%{_mandir}" in dest or "/man/man" in dest
     is_doc = "doc/" in dest
